@@ -15,9 +15,6 @@ const ContactForm = ({
       <input
         type="text"
         name="name"
-        pattern="^[a-zA-Za-яА-Я]+(([' -][a-zA-Za-яА-Я ])?[a-zA-Za-яА-Я]*)*$"
-        title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
-        required
         value={name}
         onChange={onNameChange}
         className={styles.input}
@@ -25,11 +22,8 @@ const ContactForm = ({
 
       <label className={styles.label}>Number:</label>
       <input
-        type="tel"
+        type="text"
         name="number"
-        pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
-        title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
-        required
         value={number}
         onChange={onNumberChange}
         className={styles.input}
@@ -41,6 +35,7 @@ const ContactForm = ({
     </div>
   );
 };
+
 ContactForm.propTypes = {
   name: PropTypes.string.isRequired,
   number: PropTypes.string.isRequired,

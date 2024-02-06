@@ -1,32 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
 import { nanoid } from 'nanoid';
-import ContactForm from './ContractForm';
+import ContactForm from './ContactForm';
 import ContactList from './ContactList';
 import Filter from './Filter';
 import styles from './styles.module.css';
 
 const PhonebookApp = () => {
-  const [state, setState] = useState({
-    contacts: [],
-    filter: '',
-    name: '',
-    number: '',
-  });
+  const [contacts, setContacts] = useState([]);
+  const [filter, setFilter] = useState('');
+  const [name, setName] = useState('');
+  const [number, setNumber] = useState('');
 
   useEffect(() => {
     const storedContacts = JSON.parse(localStorage.getItem('contacts'));
     if (storedContacts) {
-      setState(prevState => ({ ...prevState, contacts: storedContacts }));
+      setContacts(storedContacts);
     }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('contacts', JSON.stringify(state.contacts));
-  }, [state.contacts]);
+    localStorage.setItem('contacts', JSON.stringify(contacts));
+  }, [contacts]);
 
   const addContact = () => {
-    const contactAlreadyExists = contactExists(state.name);
+    const contactAlreadyExists = contacts.some(
+      contact => contact.name.toLowerCase() === name.toLowerCase()
+    );
 
     if (contactAlreadyExists) {
       alert('Contact with this name already exists!');
@@ -35,48 +34,39 @@ const PhonebookApp = () => {
 
     const newContact = {
       id: nanoid(),
-      name: state.name,
-      number: state.number,
+      name: name,
+      number: number,
     };
 
-    setState(prevState => ({
-      ...prevState,
-      contacts: [...prevState.contacts, newContact],
-      name: '',
-      number: '',
-    }));
+    setContacts([...contacts, newContact]);
+    setName('');
+    setNumber('');
   };
 
   const handleFilterChange = e => {
-    setState({ ...state, filter: e.target.value });
-  };
-
-  const contactExists = name => {
-    return state.contacts.some(
-      contact => contact.name.toLowerCase() === name.toLowerCase()
-    );
+    setFilter(e.target.value);
   };
 
   const handleDeleteContact = id => {
-    const updatedContacts = state.contacts.filter(contact => contact.id !== id);
-    setState(prevState => ({ ...prevState, contacts: updatedContacts }));
+    const updatedContacts = contacts.filter(contact => contact.id !== id);
+    setContacts(updatedContacts);
   };
 
-  const filteredContacts = state.contacts.filter(contact =>
-    contact.name.toLowerCase().includes(state.filter.toLowerCase())
+  const filteredContacts = contacts.filter(contact =>
+    contact.name.toLowerCase().includes(filter.toLowerCase())
   );
 
   return (
     <div className={styles.container}>
       <ContactForm
-        name={state.name}
-        number={state.number}
-        onNameChange={e => setState({ ...state, name: e.target.value })}
-        onNumberChange={e => setState({ ...state, number: e.target.value })}
+        name={name}
+        number={number}
+        onNameChange={e => setName(e.target.value)}
+        onNumberChange={e => setNumber(e.target.value)}
         onAddContact={addContact}
       />
 
-      <Filter value={state.filter} onChange={handleFilterChange} />
+      <Filter value={filter} onChange={handleFilterChange} />
 
       <h2 className={styles.label}>Contacts:</h2>
 
@@ -86,19 +76,6 @@ const PhonebookApp = () => {
       />
     </div>
   );
-};
-
-PhonebookApp.propTypes = {
-  contacts: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      number: PropTypes.string.isRequired,
-    })
-  ).isRequired,
-  filter: PropTypes.string.isRequired,
-  name: PropTypes.string.isRequired,
-  number: PropTypes.string.isRequired,
 };
 
 export default PhonebookApp;
